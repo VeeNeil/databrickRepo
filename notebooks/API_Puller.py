@@ -5,7 +5,7 @@ from pyspark.sql import SparkSession
 
 
 #Free Weather API key (don't even think about it)
-API_Key = '97680c436122aec2c5de28f1b2bd0952'
+API_KEY = '97680c436122aec2c5de28f1b2bd0952'
 CITY = "Ho Chi Minh"
 URL = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
 
@@ -13,13 +13,13 @@ while True:
     response = requests.get(URL)
     data = response.json()
     weather_record = {
-        "timestampo" : datetime.utcnow().isoformat(),
+        "timestamp" : datetime.utcnow().isoformat(),
         "city" : CITY,
         "temp_C": data["main"]["temp"]
     }
-    df = pd.DataFrame([record])
+    df = pd.DataFrame([weather_record])
     spark_df = spark.createDataFrame(df)
-    spark_df.write.mode("append").format("delta").save("/tmp/weather_delta")
+    spark_df.write.format("delta").mode("append").saveAsTable("default.weather_data")
 
     time.sleep(60)
 
